@@ -191,7 +191,7 @@ let defaultMoviesData = [
         rating: 8.2,
         type: "сериал",
         description: "Геральт из Ривии, мутант-охотник на чудовищ, путешествует по миру в поисках своей судьбы.",
-        poster: "https://via.placeholder.com/300x450/1a1a1a/e50914?text=Ведьмак",
+        poster: "https://upload.wikimedia.org/wikipedia/ru/thumb/f/f4/The_Witcher_Season_1.jpg/540px-The_Witcher_Season_1.jpg",
         trailer: "https://www.youtube.com/embed/ndl1W4ltcmg",
         reviews: []
     },
@@ -244,6 +244,7 @@ function getWatchedMovies() {
 function saveWatchedMovies(watched) {
     localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
+
 
 
 
