@@ -39,7 +39,7 @@ let defaultMoviesData = [
         rating: 8.6,
         type: "фильм",
         description: "Когда засуха приводит человечество к продовольственному кризису, коллектив исследователей и учёных отправляется сквозь червоточину в путешествие, чтобы найти новый дом для человечества.",
-        poster: "https://static.okko.tv/images/v4/1c4f72a0-2631-457b-9730-9cca4dd877c0",
+        poster: "https://avatars.mds.yandex.net/i?id=7ded75bbc69b10a8508bde9b425981dc_l-12523274-images-thumbs&n=13",
         trailer: "https://www.youtube.com/embed/zSWdZVtXT7E",
         reviews: [
             {author: "Дмитрий", rating: 10, text: "Визуально потрясающий и эмоционально мощный фильм"}
@@ -244,6 +244,7 @@ function getWatchedMovies() {
 function saveWatchedMovies(watched) {
     localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
+
 
 
 
