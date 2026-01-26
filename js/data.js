@@ -9,7 +9,7 @@ let defaultMoviesData = [
         rating: 8.8,
         type: "фильм",
         description: "Профессиональный вор, который крадёт корпоративные секреты с помощью технологии проникновения в сознание, получает шанс исправить своё криминальное прошлое, но для этого он и его команда должны совершить невозможное — inception.",
-        poster: "https://thumbs.dfs.ivi.ru/storage33/contents/4/a/0f4090e23061da066907771deb278e.jpg/858x483/?q=85&mod=to_webp",
+        poster: "https://images.unsplash.com/photo-1587597804846-208d9ee1e8e5?w=300&h=450&fit=crop",
         trailer: "https://www.youtube.com/embed/YoHD9XEInc0",
         reviews: [
             {author: "Алексей", rating: 10, text: "Шедевр кинематографа! Нолан в своём лучшем проявлении."},
@@ -244,6 +244,7 @@ function getWatchedMovies() {
 function saveWatchedMovies(watched) {
     localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
+
 
 
 
