@@ -54,7 +54,7 @@ let defaultMoviesData = [
         type: "фильм",
         description: "История банкира Энди Дюфрейна, ошибочно осуждённого за убийство жены и её любовника. В тюрьме он заводит дружбу с Редом и меняет жизнь заключённых.",
         poster: "https://avatars.mds.yandex.net/i?id=031302e556a29e30b5615a81dce9ac36_l-4363966-images-thumbs&n=13https://static.kinoafisha.info/k/movie_posters/800x1200/upload/movie_posters/1/7/5/7731571/0c4b4ffa097248647fe5ed7dc155336b.jpeg",
-        trailer: "https://www.youtube.com/embed/6hB3S9bIaco",
+        trailer: "https://www.youtube.com/embed/zSWdZVtXT7E",
         reviews: []
     },
     {
@@ -244,6 +244,7 @@ function getWatchedMovies() {
 function saveWatchedMovies(watched) {
     localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
+
 
 
 
