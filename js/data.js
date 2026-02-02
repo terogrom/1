@@ -65,7 +65,7 @@ genre: ["боевик", "драма", "триллер"],
 rating: 9.0,
 type: "фильм",
 description: "Бэтмен поднимает ставки в войне с криминалом. С помощью лейтенанта Джима Гордона и прокурора Харви Дента он намерен очистить улицы от преступности. Но появляется Джокер.",
-poster: "https://via.placeholder.com/300x450/1a1a1a/e50914?text=Тёмный+рыцарь",
+poster: "https://avatars.mds.yandex.net/i?id=785c88747cb6cbc1d467dcc90b6627c57a28e834-5309749-images-thumbs&n=13",
 trailer: "https://www.youtube.com/embed/EXeTwQWrcwY",
 reviews: []
 },
@@ -244,3 +244,4 @@ return data ? JSON.parse(data) : {};
 function saveWatchedMovies(watched) {
 localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
+
