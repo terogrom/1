@@ -1,57 +1,5 @@
 // Расширенные данные фильмов и сериалов
-let defaultMoviesData = []; // Будут загружены с сервера
-let cachedDataVersion = 0;
-let cacheTimestamp = 0;
-
-async function fetchMoviesData() {
-    try {
-        const response = await fetch('movies-data.json?' + Date.now());
-        if (!response.ok) throw new Error('Сервер недоступен');
-        const data = await response.json();
-        
-        if (data.version > cachedDataVersion) {
-            cachedDataVersion = data.version;
-            localStorage.setItem('moviesDataVersion', data.version);
-            localStorage.setItem('moviesData', JSON.stringify(data.movies));
-            localStorage.setItem('moviesCacheTimestamp', Date.now().toString());
-            console.log('Данные обновлены с сервера, версия:', data.version);
-            return data.movies;
-        }
-        return JSON.parse(localStorage.getItem('moviesData') || '[]');
-    } catch (error) {
-        console.warn('Ошибка загрузки с сервера, использую localStorage:', error);
-        return getMoviesDataFromLocal();
-    }
-}
-
-function getMoviesDataFromLocal() {
-    const data = localStorage.getItem('moviesData');
-    return data ? JSON.parse(data) : defaultMoviesData;
-}
-
-function getMoviesData() {
-    const timestamp = parseInt(localStorage.getItem('moviesCacheTimestamp') || '0');
-    if (Date.now() - timestamp > 5 * 60 * 1000) { // Обновлять каждые 5 минут
-        fetchMoviesData().then(data => {
-            // Перезагружаем контент
-            if (window.loadHomeContent) loadHomeContent();
-            if (window.loadMoviesContent) loadMoviesContent();
-            if (window.loadSeriesContent) loadSeriesContent();
-        });
-    }
-    return getMoviesDataFromLocal();
-}
-
-function saveMoviesDataLocal(data) {
-    localStorage.setItem('moviesData', JSON.stringify(data));
-}
-
-// Админ сохраняет в localStorage + уведомляет о необходимости обновить JSON на сервере
-function adminSaveMoviesData(data) {
-    saveMoviesDataLocal(data);
-    alert('✅ Изменения сохранены локально! Обновите movies-data.json на сервере для синхронизации.');
-}
-
+let defaultMoviesData = [
 // ФИЛЬМЫ
 {
 id: 1,
@@ -61,7 +9,7 @@ genre: ["фантастика", "боевик", "триллер"],
 rating: 8.8,
 type: "фильм",
 description: "Профессиональный вор, который крадёт корпоративные секреты с помощью технологии проникновения в сознание, получает шанс исправить своё криминальное прошлое, но для этого он и его команда должны совершить невозможное — inception.",
-poster: "http://images-s.kinorium.com/movie/poster/472809/w1500_52479049.jpg",
+poster: "https://thumbs.dfs.ivi.ru/storage33/contents/4/a/0f4090e23061da066907771deb278e.jpg/858x483/?q=85&mod=to_webp",
 trailer: "https://www.youtube.com/embed/YoHD9XEInc0",
 reviews: [
 {author: "Алексей", rating: 10, text: "Шедевр кинематографа! Нолан в своём лучшем проявлении."},
@@ -262,83 +210,38 @@ reviews: []
 ];
 
 // Жанры для фильтров
-const movieGenres = ['Драма', 'Боевик', 'Фантастика', 'Комедия'];
-const seriesGenres = ['Драма', 'Фантастика', 'Детектив', 'Комедия'];
+const movieGenres = ["драма", "фантастика", "боевик", "триллер", "комедия", "приключения"];
+const seriesGenres = ["фэнтези", "драма", "триллер", "комедия", "документальный"];
 
-let dataVersion = 1; // Глобальная версия данных
-
-function getDataVersion() {
-    return parseInt(localStorage.getItem('moviesDataVersion') || dataVersion);
-}
-
-function saveDataVersion(version) {
-    localStorage.setItem('moviesDataVersion', version.toString());
-    dataVersion = version;
-}
-
+// Функции для работы с localStorage
 function getMoviesData() {
-    const storedVersion = parseInt(localStorage.getItem('moviesDataVersion') || '0');
-    const data = localStorage.getItem('moviesData');
-    if (data && storedVersion >= dataVersion - 1) {
-        try {
-            return JSON.parse(data);
-        } catch (e) {
-            console.warn('Ошибка парсинга moviesData, использую дефолтные данные');
-        }
-    }
-    // Если версия устарела или нет данных - возвращаем дефолт и сохраняем
-    saveMoviesData(defaultMoviesData);
-    saveDataVersion(dataVersion);
-    return defaultMoviesData;
+const data = localStorage.getItem('moviesData');
+if (data) {
+return JSON.parse(data);
+}
+saveMoviesData(defaultMoviesData);
+return defaultMoviesData;
 }
 
 function saveMoviesData(data) {
-    localStorage.setItem('moviesData', JSON.stringify(data));
-    // Увеличиваем версию при каждом сохранении
-    saveDataVersion(dataVersion + 1);
-    // Очищаем кэш изображений для всех фильмов
-    clearImageCache(data);
-    console.log(`Данные сохранены, новая версия: ${dataVersion}`);
+localStorage.setItem('moviesData', JSON.stringify(data));
 }
 
-function clearImageCache(movies) {
-    movies.forEach(movie => {
-        if (movie.poster) {
-            // Удаляем кэш изображения
-            const link = document.createElement('link');
-            link.href = movie.poster + '?v=' + Date.now();
-            link.rel = 'prefetch';
-            document.head.appendChild(link);
-            setTimeout(() => document.head.removeChild(link), 100);
-        }
-    });
-    // Service Worker unregister если есть
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-            registrations.forEach(reg => reg.unregister());
-        });
-    }
-}
-
-// Остальные функции без изменений
 function getUserRatings() {
-    const data = localStorage.getItem('userRatings');
-    return data ? JSON.parse(data) : {};
+const data = localStorage.getItem('userRatings');
+return data ? JSON.parse(data) : {};
 }
 
 function saveUserRatings(ratings) {
-    localStorage.setItem('userRatings', JSON.stringify(ratings));
+localStorage.setItem('userRatings', JSON.stringify(ratings));
 }
 
 function getWatchedMovies() {
-    const data = localStorage.getItem('watchedMovies');
-    return data ? JSON.parse(data) : [];
+const data = localStorage.getItem('watchedMovies');
+return data ? JSON.parse(data) : {};
 }
 
 function saveWatchedMovies(watched) {
-    localStorage.setItem('watchedMovies', JSON.stringify(watched));
+localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
-
-
-
 
