@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "movies": [
+    {
+      "id": 1,
+      "title": "Начало",
+      "year": 2010,
+      "type": "movie",
+      "genre": ["Фантастика", "Боевик", "Триллер"],
+      "rating": 8.8,
+      "description": "Инцепция.",
+      "poster": "https://thumbs.dfs.ivi.ru/storage/3/contents/4/a0f4090-e23061da066907771deb278e.jpg?858x483&q=85&mode=to.webp",
+      "trailer": "https://www.youtube.com/embed/YoHD9XEInc0",
+      "reviews": []
+    }
+    // Добавьте все ваши фильмы/сериалы сюда
+  ]
+}
