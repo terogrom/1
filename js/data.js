@@ -210,38 +210,81 @@ reviews: []
 ];
 
 // Жанры для фильтров
-const movieGenres = ["драма", "фантастика", "боевик", "триллер", "комедия", "приключения"];
-const seriesGenres = ["фэнтези", "драма", "триллер", "комедия", "документальный"];
+const movieGenres = ['Драма', 'Боевик', 'Фантастика', 'Комедия'];
+const seriesGenres = ['Драма', 'Фантастика', 'Детектив', 'Комедия'];
 
-// Функции для работы с localStorage
-function getMoviesData() {
-const data = localStorage.getItem('moviesData');
-if (data) {
-return JSON.parse(data);
+let dataVersion = 1; // Глобальная версия данных
+
+function getDataVersion() {
+    return parseInt(localStorage.getItem('moviesDataVersion') || dataVersion);
 }
-saveMoviesData(defaultMoviesData);
-return defaultMoviesData;
+
+function saveDataVersion(version) {
+    localStorage.setItem('moviesDataVersion', version.toString());
+    dataVersion = version;
+}
+
+function getMoviesData() {
+    const storedVersion = parseInt(localStorage.getItem('moviesDataVersion') || '0');
+    const data = localStorage.getItem('moviesData');
+    if (data && storedVersion >= dataVersion - 1) {
+        try {
+            return JSON.parse(data);
+        } catch (e) {
+            console.warn('Ошибка парсинга moviesData, использую дефолтные данные');
+        }
+    }
+    // Если версия устарела или нет данных - возвращаем дефолт и сохраняем
+    saveMoviesData(defaultMoviesData);
+    saveDataVersion(dataVersion);
+    return defaultMoviesData;
 }
 
 function saveMoviesData(data) {
-localStorage.setItem('moviesData', JSON.stringify(data));
+    localStorage.setItem('moviesData', JSON.stringify(data));
+    // Увеличиваем версию при каждом сохранении
+    saveDataVersion(dataVersion + 1);
+    // Очищаем кэш изображений для всех фильмов
+    clearImageCache(data);
+    console.log(`Данные сохранены, новая версия: ${dataVersion}`);
 }
 
+function clearImageCache(movies) {
+    movies.forEach(movie => {
+        if (movie.poster) {
+            // Удаляем кэш изображения
+            const link = document.createElement('link');
+            link.href = movie.poster + '?v=' + Date.now();
+            link.rel = 'prefetch';
+            document.head.appendChild(link);
+            setTimeout(() => document.head.removeChild(link), 100);
+        }
+    });
+    // Service Worker unregister если есть
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(reg => reg.unregister());
+        });
+    }
+}
+
+// Остальные функции без изменений
 function getUserRatings() {
-const data = localStorage.getItem('userRatings');
-return data ? JSON.parse(data) : {};
+    const data = localStorage.getItem('userRatings');
+    return data ? JSON.parse(data) : {};
 }
 
 function saveUserRatings(ratings) {
-localStorage.setItem('userRatings', JSON.stringify(ratings));
+    localStorage.setItem('userRatings', JSON.stringify(ratings));
 }
 
 function getWatchedMovies() {
-const data = localStorage.getItem('watchedMovies');
-return data ? JSON.parse(data) : {};
+    const data = localStorage.getItem('watchedMovies');
+    return data ? JSON.parse(data) : [];
 }
 
 function saveWatchedMovies(watched) {
-localStorage.setItem('watchedMovies', JSON.stringify(watched));
+    localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
+
 
