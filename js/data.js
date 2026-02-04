@@ -24,7 +24,7 @@ genre: ["фантастика", "боевик"],
 rating: 8.7,
 type: "фильм",
 description: "Жизнь Томаса Андерсона разделена на две части: днём он — самый обычный офисный работник, а ночью — хакер по имени Нео. Однажды он узнаёт страшную правду о реальности.",
-poster: "https://via.placeholder.com/300x450/1a1a1a/e50914?text=Матрица",
+poster: "https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg",
 trailer: "https://www.youtube.com/embed/m8e-FF8MsqU",
 reviews: [
 {author: "Иван", rating: 10, text: "Революция в киноиндустрии"},
@@ -244,4 +244,5 @@ return data ? JSON.parse(data) : {};
 function saveWatchedMovies(watched) {
 localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
+
 
