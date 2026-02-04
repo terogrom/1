@@ -1,17 +1,16 @@
 let currentMovieId = null;
 
 function openMovieModal(id) {
-currentMovieId = id;
-const movies = getMoviesData();
-const movie = movies.find(m => m.id === id);
-
-if (!movie) return;
+    const movies = getMoviesData(); // Всегда свежие данные
+    const version = getDataVersion();
+    const movie = movies.find(m => m.id == id);
+    if (!movie) return;
 
 document.getElementById('modalTitle').textContent = movie.title;
 document.getElementById('modalMeta').textContent = `${movie.year} • ${movie.type}`;
 document.getElementById('modalRating').innerHTML = `⭐ ${movie.rating}/10`;
 document.getElementById('modalDescription').textContent = movie.description;
-document.getElementById('modalPoster').src = movie.poster;
+document.getElementById('modalPoster').src = movie.poster + '?v=' + version;
 
 if (movie.trailer) {
 document.getElementById('modalTrailer').innerHTML = `
@@ -111,3 +110,4 @@ currentMovieId = null;
 }
 });
 });
+
