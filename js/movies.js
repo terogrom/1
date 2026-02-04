@@ -49,22 +49,15 @@ function loadWatchedContent() {
 }
 
 function createMovieCard(movie) {
-    // Добавляем версию к URL изображения для обхода кэша
-    const version = getDataVersion();
-    const posterUrl = movie.poster + (movie.poster.includes('?') ? '&' : '?') + 'v=' + version;
-    
     return `
         <div class="movie-card" onclick="openMovieModal(${movie.id})">
-            <img src="${posterUrl}" alt="${movie.title}" class="movie-poster" 
-                 onerror="this.src='https://via.placeholder.com/300x450/1a1a1a/e50914?text=Нет+постера'" 
-                 loading="lazy">
+            <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
             <div class="movie-info">
                 <h3 class="movie-title">${movie.title}</h3>
                 <div class="movie-meta">${movie.year} • ${movie.type}</div>
                 <div class="movie-genre">${movie.genre.join(', ')}</div>
-                <div class="movie-rating">${movie.rating}/10</div>
+                <div class="movie-rating">⭐ ${movie.rating}/10</div>
             </div>
         </div>
     `;
 }
-
