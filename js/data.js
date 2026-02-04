@@ -1,5 +1,57 @@
 // Расширенные данные фильмов и сериалов
-let defaultMoviesData = [
+let defaultMoviesData = []; // Будут загружены с сервера
+let cachedDataVersion = 0;
+let cacheTimestamp = 0;
+
+async function fetchMoviesData() {
+    try {
+        const response = await fetch('movies-data.json?' + Date.now());
+        if (!response.ok) throw new Error('Сервер недоступен');
+        const data = await response.json();
+        
+        if (data.version > cachedDataVersion) {
+            cachedDataVersion = data.version;
+            localStorage.setItem('moviesDataVersion', data.version);
+            localStorage.setItem('moviesData', JSON.stringify(data.movies));
+            localStorage.setItem('moviesCacheTimestamp', Date.now().toString());
+            console.log('Данные обновлены с сервера, версия:', data.version);
+            return data.movies;
+        }
+        return JSON.parse(localStorage.getItem('moviesData') || '[]');
+    } catch (error) {
+        console.warn('Ошибка загрузки с сервера, использую localStorage:', error);
+        return getMoviesDataFromLocal();
+    }
+}
+
+function getMoviesDataFromLocal() {
+    const data = localStorage.getItem('moviesData');
+    return data ? JSON.parse(data) : defaultMoviesData;
+}
+
+function getMoviesData() {
+    const timestamp = parseInt(localStorage.getItem('moviesCacheTimestamp') || '0');
+    if (Date.now() - timestamp > 5 * 60 * 1000) { // Обновлять каждые 5 минут
+        fetchMoviesData().then(data => {
+            // Перезагружаем контент
+            if (window.loadHomeContent) loadHomeContent();
+            if (window.loadMoviesContent) loadMoviesContent();
+            if (window.loadSeriesContent) loadSeriesContent();
+        });
+    }
+    return getMoviesDataFromLocal();
+}
+
+function saveMoviesDataLocal(data) {
+    localStorage.setItem('moviesData', JSON.stringify(data));
+}
+
+// Админ сохраняет в localStorage + уведомляет о необходимости обновить JSON на сервере
+function adminSaveMoviesData(data) {
+    saveMoviesDataLocal(data);
+    alert('✅ Изменения сохранены локально! Обновите movies-data.json на сервере для синхронизации.');
+}
+
 // ФИЛЬМЫ
 {
 id: 1,
@@ -286,6 +338,7 @@ function getWatchedMovies() {
 function saveWatchedMovies(watched) {
     localStorage.setItem('watchedMovies', JSON.stringify(watched));
 }
+
 
 
 
