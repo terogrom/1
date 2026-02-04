@@ -66,7 +66,6 @@ function deleteMovie(id) {
 function saveMovie() {
     const id = document.getElementById('editMovieId').value;
     const movies = getMoviesData();
-    
     const movieData = {
         title: document.getElementById('movieTitle').value,
         year: parseInt(document.getElementById('movieYear').value),
@@ -78,29 +77,25 @@ function saveMovie() {
         trailer: document.getElementById('movieTrailer').value,
         reviews: []
     };
-    
+
     if (id) {
-        // Редактирование
-        const index = movies.findIndex(m => m.id === parseInt(id));
-        movies[index] = { ...movies[index], ...movieData };
+        const index = movies.findIndex(m => m.id == parseInt(id));
+        movies[index] = {...movies[index], ...movieData};
     } else {
-        // Добавление
         movieData.id = Math.max(...movies.map(m => m.id)) + 1;
         movies.push(movieData);
     }
-    
-    saveMoviesData(movies);
+
+    saveMoviesData(movies); // Теперь сохраняет с автоувеличением версии
     cancelMovieForm();
     loadAdminMovieList();
     loadMoviesContent();
     loadSeriesContent();
-    alert('Сохранено!');
+    loadHomeContent(); // Добавьте эту строку если есть функция
+    
+    alert(id ? 'Фильм обновлён! Новая версия загружена у всех.' : 'Фильм добавлен! Обновление отправлено всем пользователям.');
+    
+    // Принудительная перезагрузка вкладки для админа
+    setTimeout(() => location.reload(), 1000);
 }
 
-function cancelMovieForm() {
-    document.getElementById('addMovieForm').style.display = 'none';
-}
-
-function closeAdminPanel() {
-    document.getElementById('adminPanel').style.display = 'none';
-}
