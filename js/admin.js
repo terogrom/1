@@ -1,3 +1,5 @@
+// admin.js - Панель администратора с автосохранением в GitHub
+
 function setupAdminPanel() {
     document.getElementById('adminToggle').addEventListener('click', () => {
         document.getElementById('adminPanel').style.display = 'flex';
@@ -15,8 +17,8 @@ function loadAdminMovieList() {
                 <strong>${movie.title}</strong> (${movie.year}) - ${movie.type}
             </div>
             <div class="admin-actions">
-                <button class="btn btn-small" onclick="editMovie(${movie.id})">Редактировать</button>
-                <button class="btn btn-small btn-danger" onclick="deleteMovie(${movie.id})">Удалить</button>
+                <button class="btn btn-small" onclick="editMovie(${movie.id})">✏️ Редактировать</button>
+                <button class="btn btn-small btn-danger" onclick="deleteMovie(${movie.id})">🗑️ Удалить</button>
             </div>
         </div>
     `).join('');
@@ -39,7 +41,7 @@ function editMovie(id) {
     const movies = getMoviesData();
     const movie = movies.find(m => m.id === id);
     if (!movie) return;
-    
+
     document.getElementById('addMovieForm').style.display = 'block';
     document.getElementById('editMovieId').value = movie.id;
     document.getElementById('movieTitle').value = movie.title;
@@ -49,24 +51,28 @@ function editMovie(id) {
     document.getElementById('movieRating').value = movie.rating;
     document.getElementById('movieDescription').value = movie.description;
     document.getElementById('moviePoster').value = movie.poster;
-    document.getElementById('movieTrailer').value = movie.trailer || '';
+    document.getElementById('movieTrailer').value = movie.trailer;
 }
 
-function deleteMovie(id) {
-    if (!confirm('Удалить этот фильм/сериал?')) return;
-    
+async function deleteMovie(id) {
+    if (!confirm('Вы уверены, что хотите удалить этот фильм?')) return;
+
     let movies = getMoviesData();
     movies = movies.filter(m => m.id !== id);
-    saveMoviesData(movies);
-    loadAdminMovieList();
-    loadMoviesContent();
-    loadSeriesContent();
+    
+    const success = await saveMoviesData(movies);
+    
+    if (success) {
+        loadAdminMovieList();
+        loadMoviesContent();
+        loadSeriesContent();
+    }
 }
 
-function saveMovie() {
+async function saveMovie() {
     const id = document.getElementById('editMovieId').value;
-    const movies = getMoviesData();
-    
+    let movies = getMoviesData();
+
     const movieData = {
         title: document.getElementById('movieTitle').value,
         year: parseInt(document.getElementById('movieYear').value),
@@ -78,23 +84,25 @@ function saveMovie() {
         trailer: document.getElementById('movieTrailer').value,
         reviews: []
     };
-    
+
     if (id) {
-        // Редактирование
+        // Редактирование существующего
         const index = movies.findIndex(m => m.id === parseInt(id));
         movies[index] = { ...movies[index], ...movieData };
     } else {
-        // Добавление
+        // Добавление нового
         movieData.id = Math.max(...movies.map(m => m.id)) + 1;
         movies.push(movieData);
     }
+
+    const success = await saveMoviesData(movies);
     
-    saveMoviesData(movies);
-    cancelMovieForm();
-    loadAdminMovieList();
-    loadMoviesContent();
-    loadSeriesContent();
-    alert('Сохранено!');
+    if (success) {
+        cancelMovieForm();
+        loadAdminMovieList();
+        loadMoviesContent();
+        loadSeriesContent();
+    }
 }
 
 function cancelMovieForm() {
@@ -103,4 +111,54 @@ function cancelMovieForm() {
 
 function closeAdminPanel() {
     document.getElementById('adminPanel').style.display = 'none';
+}
+
+// ===== НОВЫЕ ФУНКЦИИ ДЛЯ ЭКСПОРТА/ИМПОРТА =====
+
+function exportMoviesToJSON() {
+    const movies = getMoviesData();
+    const json = JSON.stringify(movies, null, 2);
+    
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `movies-backup-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Резервная копия скачана!');
+}
+
+function showImportDialog() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            await importMoviesFromJSON(file);
+            alert('✅ Данные импортированы и сохранены в GitHub!');
+        } catch (error) {
+            alert('❌ Ошибка импорта:\n' + error.message);
+        }
+    };
+    
+    input.click();
+}
+
+async function refreshDataFromGitHub() {
+    try {
+        const movies = await refreshMoviesData();
+        loadAdminMovieList();
+        loadHomeContent();
+        loadMoviesContent();
+        loadSeriesContent();
+        alert('✅ Данные обновлены из GitHub!\nЗагружено фильмов: ' + movies.length);
+    } catch (error) {
+        alert('❌ Ошибка обновления:\n' + error.message);
+    }
 }
